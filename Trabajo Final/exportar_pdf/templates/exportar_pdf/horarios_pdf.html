@@ -1,0 +1,242 @@
+{% load dict_extras %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 15px;
+        color: #333;
+        line-height: 1.4;
+    }
+    
+    /* Header principal */
+    .main-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        border-bottom: 3px solid #0A1E40;
+        background-color: #f8fafc;
+        border-radius: 8px;
+    }
+    
+    .main-title {
+        color: #0A1E40;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .subtitle {
+        color: #64748b;
+        font-size: 12px;
+        margin: 5px 0 0 0;
+        font-style: italic;
+    }
+    
+    /* Headers por año */
+    .year-section {
+        margin: 25px 0;
+    }
+    
+    .year-header {
+        background-color: #0A1E40;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px 8px 0 0;
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .classroom-info {
+        background-color: #0A1E40;
+        color: white;
+        padding: 8px 20px;
+        margin: 0;
+        font-size: 14px;
+        text-align: center;
+        border-radius: 0 0 8px 8px;
+    }
+    
+    /* Tabla principal */
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+        margin: 0;
+        border: 2px solid #0A1E40; 
+        background: white;
+    }
+    
+    /* Headers de tabla */
+    .schedule-table thead th {
+        background-color: #0A1E40;
+        color: white;
+        font-weight: bold;
+        padding: 12px 8px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .time-header {
+        width: 90px;
+        border-right: 2px solid #1e40af;
+    }
+    
+    .day-header {
+        width: 130px;
+    }
+    
+    /* Celdas de tiempo */
+    .time-cell {
+        background-color: #0A1E40;
+        color: white;
+        font-weight: bold;
+        padding: 8px 6px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 9px;
+        border-right: 2px solid #1e40af;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    /* Celdas de cursos */
+    .course-cell {
+        padding: 8px 6px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 9px;
+        word-wrap: break-word;
+        background: white;
+    }
+    
+    .course-cell-filled {
+        background-color: #f0f9ff;
+        color: #0c4a6e;
+        font-weight: bold;
+    }
+    
+    /* Filas alternas para celdas vacías */
+    .even-row .course-cell {
+        background-color: #f8fafc;
+    }
+    
+    /* Separadores de tiempo (recreo) */
+    .break-time-cell {
+        background-color: #64748b;
+        color: white;
+        font-weight: bold;
+        padding: 8px 6px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 9px;
+        border-right: 2px solid #475569;
+        border-bottom: 1px solid #e2e8f0;
+        font-style: italic;
+    }
+    
+    .break-course-cell {
+        background-color: #f1f5f9;
+        padding: 8px 6px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 9px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    /* Footer informativo */
+    .footer-info {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f8fafc;
+        border-radius: 6px;
+        font-size: 8px;
+        color: #64748b;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    
+    /* Page breaks */
+    .page-break {
+        page-break-before: always;
+    }
+</style>
+</head>
+<body>
+
+<div class="main-header">
+    <h1 class="main-title">Horarios de Teoría 2025</h1>
+</div>
+
+{% for anio in anios %}
+    {% if not forloop.first %}
+        <div class="page-break"></div>
+    {% endif %}
+    
+    <div class="year-section">
+        <h2 class="year-header">{{ anio|upper }}</h2>
+        <h3 class="classroom-info">AULA {{ aulas|dict_get:anio }}</h3>
+        
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th class="time-header">Horario</th>
+                    {% for dia in dias %}
+                        <th class="day-header">{{ dia|title }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% with horarios=datos_estructurados|dict_get:anio %}
+                    {% for fila in horarios %}
+                        <tr {% if forloop.counter0|divisibleby:2 %}class="even-row"{% endif %}>
+                            {% if fila.hora_inicio == "12:20" or fila.hora_inicio == "13:10" %}
+                                <td class="break-time-cell">{{ fila.hora }}</td>
+                            {% else %}
+                                <td class="time-cell">{{ fila.hora }}</td>
+                            {% endif %}
+                            
+                            {% for dia in dias %}
+                                {% with celda_dia=fila|dict_get:dia %}
+                                    {% if celda_dia.es_primer_bloque or not celda_dia.curso %}
+                                        {% if fila.hora_inicio == "12:20" or fila.hora_inicio == "13:10" %}
+                                            <td class="break-course-cell" 
+                                                {% if celda_dia.curso and celda_dia.duracion > 1 %}
+                                                    rowspan="{{ celda_dia.duracion }}"
+                                                {% endif %}>
+                                                {% if celda_dia.curso %}
+                                                    {{ celda_dia.curso }}
+                                                {% endif %}
+                                            </td>
+                                        {% else %}
+                                            <td class="{% if celda_dia.curso %}course-cell-filled{% else %}course-cell{% endif %}" 
+                                                {% if celda_dia.curso and celda_dia.duracion > 1 %}
+                                                    rowspan="{{ celda_dia.duracion }}"
+                                                {% endif %}>
+                                                {% if celda_dia.curso %}
+                                                    {{ celda_dia.curso }}
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>
+{% endfor %}
+
+</body>
+</html>
