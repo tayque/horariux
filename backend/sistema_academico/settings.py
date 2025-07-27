@@ -30,6 +30,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = [
     'lab07-pweb2.vercel.app',
     'horariux.vercel.app', 
+    "horariux-2yw6yxmo9-tniias-projects.vercel.app", 
     '127.0.0.1',
     'localhost'
 ]
