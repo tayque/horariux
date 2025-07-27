@@ -36,11 +36,8 @@ class GenerarHorarioView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         created_by = request.user.username if request.user.is_authenticated else "Sistema"
-        
-        ultimo_numero = ScheduleVersion.objects.filter(term=term).aggregate(Max('version_number'))['version_number__max'] or 0
-        nuevo_numero = ultimo_numero + 1
         schedule_version, errores = generate_schedule(
-            term_id=nuevo_numero,
+            term_id=semester,
             mallas_por_año=mallas,
             cursos_con_seccion_C=cursos_c,
             created_by=created_by
