@@ -245,12 +245,16 @@ def generate_schedule(term_id: int, mallas_por_año: dict[int, int], cursos_con_
     aulas_preferentes = {a.year_preference: a for a in aulas if a.year_preference}
     aula_comodin = next((a for a in aulas if a.short_code == "205"), None)
 
-    grupos_a_agendar = []
     for year_str, malla in mallas_por_año.items():
+        grupos_a_agendar = []
+        
         try:
             nivel = AcademicYearLevel.objects.get(year_level=int(year_str), semester_number=term.id)
+            print("Obteniendo grupos para el año:", year_str, "y malla:", malla, "con nivel:", nivel)
             curriculum = Curriculum.objects.get(year=malla)
             grupos_a_agendar.extend(list(CourseGroup.objects.filter(course__term=term, course__curriculum=curriculum, academic_year_level=nivel).select_related("course", "academic_year_level")))
+            for grupo in grupos_a_agendar:
+                print (f"Grupo encontrado: {grupo.course.name} - {grupo.group_code}")
         except Exception: print(f"Error al obtener grupos para el año {year_str} y malla {malla}.")
 
     best_sessions, best_unplaced = [], [{'id': i} for i in range(len(grupos_a_agendar) + 1)]
