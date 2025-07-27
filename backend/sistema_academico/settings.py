@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     'horariux.vercel.app', 
     "horariux-2yw6yxmo9-tniias-projects.vercel.app", 
     '127.0.0.1',
+    'horariux-git-main-tniias-projects.vercel.app',
     'localhost'
 ]
 
