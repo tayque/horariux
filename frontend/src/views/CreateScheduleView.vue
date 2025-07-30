@@ -459,6 +459,7 @@ export default {
         .then(response => {
           console.log('Guardado exitosamente:', response.data);
           this.docenteGuardado = true;
+          this.resetearFormulario();
         })
         .catch(error => {
           if (error.response) {
